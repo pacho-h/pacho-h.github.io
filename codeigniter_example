@@ -1,0 +1,112 @@
+application/controllers/Main.php
+
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Main extends CI_Controller {
+	public function __construct()
+    {
+        parent::__construct();
+    }
+
+	public function index()
+	{
+		$this->load->model('board');
+		$data["rows"] = $this->board->get_list();
+		$this->load->view('main', $data);
+	}
+}
+
+
+application/models/board.php
+
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Board extends CI_Model {
+	public function __construct()
+    {
+        parent::__construct();
+        // database 라이브러리를 load한다.
+        $this->load->database();
+    }
+
+	public function get_list()
+	{
+		// http://www.ciboard.co.kr/user_guide/kr/database/query_builder.html#selecting-data
+		// SELECT * FROM `board`
+		$query = $this->db->get('board');
+		
+		return $query->result_array();
+	}
+
+	public function view($num)
+	{
+		// http://www.ciboard.co.kr/user_guide/kr/database/query_builder.html#selecting-data
+		// SELECT * FROM `board` WHERE `num` = $num
+		$this->db->where(array("num"=>$num));
+		$query = $this->db->get('board');
+		
+		// 오직 하나의 레코드만 받아 오기때문에 받아서 $query = result_array()[0] 처리
+		return $query->result_array()[0];
+	}
+
+	public function write($data)
+	{
+		$query = $this->db->insert('board', $data);
+		
+		return $query->result_array()[0];
+	}
+
+	public function update()
+	{
+
+	}
+
+	public function delete($num)
+	{
+
+	}
+}
+
+
+application/views/main.php
+
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Main</title>
+	<style type="text/css">
+		table {
+			width: 90%;
+			border: 1px solid;
+			margin: auto;
+		}
+		th,td{
+			border: 1px solid;
+		}
+	</style>
+</head>
+<body>
+<table>
+	<tr>
+		<th style="width:10%">번호</th>
+		<th style="width:50%">제목</th>
+		<th style="width:20%">이름</th>
+		<th style="width:20%">날짜</th>
+	</tr>
+	<?php foreach($rows as $row) { ?>
+	<tr>
+		<td style="text-align: center"><?=$row['num']?></td>
+		<td><?=$row['subject']?></td>
+		<td style="text-align: center"><?=$row['name']?></td>
+		<td style="text-align: center"><?=$row['date']?></td>
+	</tr>
+	<?php } ?>
+</table>
+</body>
+</html>
